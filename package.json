@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/match-sorter-utils": "latest",
     "@tanstack/react-devtools": "latest",
@@ -30,6 +32,7 @@
     "@tanstack/router-plugin": "^1.132.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
     "lucide-react": "^0.577.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
@@ -55,6 +58,7 @@
     "eslint": "^9.20.0",
     "jsdom": "^28.1.0",
     "prettier": "^3.8.1",
+    "prisma": "^7.8.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "vitest": "^4.1.5"
