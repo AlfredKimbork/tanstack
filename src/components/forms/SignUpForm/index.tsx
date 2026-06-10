@@ -1,10 +1,10 @@
 import { useForm } from '@tanstack/react-form'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
 
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 
-import addUser from '../../../lib/addUser'
+import addUser from '#/lib/utils/addUser'
 
 interface signUpFormValues {
   username: string
@@ -12,6 +12,7 @@ interface signUpFormValues {
   password: string
   confirmPassword: string
   administrator: boolean
+  remember: boolean
 }
 
 export default function SignUpForm() {
@@ -19,6 +20,8 @@ export default function SignUpForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const navigate = useNavigate();
 
   const form = useForm({
     defaultValues: {
@@ -31,12 +34,10 @@ export default function SignUpForm() {
     onSubmit: async ({ value }) => {
       if(!await addUser({ data: value })) {
         setUserExists(true);
-        setSubmitting(false);
       }
         else {
           setUserExists(false);
-          setSubmitting(false);
-          form.reset();
+          navigate({ to: '/' });
         }
     },
   });
@@ -147,7 +148,10 @@ export default function SignUpForm() {
                   />
                   <button 
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowPassword(!showPassword)}
+                    }
                   >
                     {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
                   </button>
@@ -190,7 +194,10 @@ export default function SignUpForm() {
                   />
                   <button 
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    onClick={(e) =>{
+                      e.preventDefault();
+                      setShowConfirmPassword(!showConfirmPassword)}
+                    } 
                   >
                     {showConfirmPassword ? <FaRegEyeSlash /> : <FaRegEye />}
                   </button>
@@ -216,6 +223,35 @@ export default function SignUpForm() {
                   className="flex items-center gap-2"
                 >
                   Administrator
+                  <input
+                    id={field.name}
+                    className="order-first"
+                    type="checkbox"
+                    name={field.name}
+                    checked={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                  />
+                </label>
+              </>
+            )
+          }}
+        />
+      </div>
+      <div>
+        <form.Field
+          name="remember"
+          validators={{
+            onChange: () => 
+              undefined,
+          }}
+          children={(field) => {
+            return (
+              <>
+                <label 
+                  htmlFor={field.name}
+                  className="flex items-center gap-2"
+                >
+                  Remember me
                   <input
                     id={field.name}
                     className="order-first"

@@ -1,12 +1,16 @@
-import getByEmail from '#/lib/getByEmail'
 import { useForm } from '@tanstack/react-form'
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+
+import getByEmail from '#/lib/utils/getByEmail'
+import login from '#/lib/login'
 
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 
 interface LoginFormValues {
   email: string
   password: string
+  remember: boolean
 }
 
 export default function LoginForm() {
@@ -16,13 +20,16 @@ export default function LoginForm() {
     .then(user => user?.password)
   const checkEmail = (email: string) => getByEmail({ data: { email } })
 
+  const navigate = useNavigate();
+
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     } as LoginFormValues,
     onSubmit: async ({ value }) => {
-      console.log(`email - ${value.email}`, `password - ${value.password}`)
+      login(value.remember, await getByEmail({ data: { email: value.email } }));
+      navigate({ to: '/' });
     },
   })
 
@@ -112,7 +119,10 @@ export default function LoginForm() {
                     />
                   <button 
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowPassword(!showPassword)}
+                    }
                   >
                     {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
                   </button>
@@ -123,8 +133,35 @@ export default function LoginForm() {
           }}
         />
       </div>
-
-
+      <div>
+        <form.Field
+          name="remember"
+          validators={{
+            onChange: () => 
+              undefined,
+          }}
+          children={(field) => {
+            return (
+              <>
+                <label 
+                  htmlFor={field.name}
+                  className="flex items-center gap-2"
+                >
+                  Remember me
+                  <input
+                    id={field.name}
+                    className="order-first"
+                    type="checkbox"
+                    name={field.name}
+                    checked={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                  />
+                </label>
+              </>
+            )
+          }}
+        />
+      </div>
       <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Login</button>
     </form>
   )
