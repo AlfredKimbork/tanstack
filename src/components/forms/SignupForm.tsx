@@ -53,7 +53,10 @@ export default function SignUpForm() {
     <form
       onSubmit={(e) => {
         setLogingIn(true);
-        setTimeout(() => setLogingIn("error"), 2000);
+        setTimeout(() => {
+          form.handleSubmit();
+          setTimeout(() => setLogingIn("error"), 2000);
+        }, 2000);
         e.preventDefault();
         e.stopPropagation();
         form.handleSubmit();
@@ -158,8 +161,9 @@ export default function SignUpForm() {
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
                     onClick={(e) => {
                       e.preventDefault();
-                      setShowPassword(!showPassword)}
-                    }
+                      setShowPassword(!showPassword)
+                      setTimeout(() => setShowPassword(false), 2000);
+                    }}
                   >
                     {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
                   </button>
@@ -205,7 +209,7 @@ export default function SignUpForm() {
                     onClick={(e) =>{
                       e.preventDefault();
                       setShowConfirmPassword(!showConfirmPassword);
-                      setTimeout(() => setShowPassword(false), 2000);
+                      setTimeout(() => setShowConfirmPassword(false), 2000);
                     }
                     } 
                   >

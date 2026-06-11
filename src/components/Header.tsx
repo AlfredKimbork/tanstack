@@ -1,7 +1,8 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { useLoggedInUser } from '#/integrations/tanstack-query/root-provider'
 
 export default function Header() {
+  const location = useLocation()
   const loggedInUser = useLoggedInUser()
 
   return (
@@ -16,6 +17,13 @@ export default function Header() {
           <li><Link to="/products" activeProps={{ className: "text-blue-500 font-bold" }}>Products</Link></li>
           {loggedInUser?.administrator && (
             <li><Link to="/dashboard" activeProps={{ className: "text-blue-500 font-bold" }}>Dashboard</Link></li>
+          )}
+          {location.pathname.startsWith('/dashboard') && (
+              <>
+                <li className="select-none">-</li>
+                <li><Link to="/dashboard/users" activeProps={{ className: "text-blue-500 font-bold" }}>Users</Link></li>
+                <li><Link to="/dashboard/products" activeProps={{ className: "text-blue-500 font-bold" }}>Products</Link></li>
+              </>
           )}
         </ul>
         <Link to={loggedInUser ? "/account" : "/login"} className="px-4 py-2 rounded-md bg-blue-500 text-white">

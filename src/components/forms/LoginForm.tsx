@@ -50,7 +50,10 @@ export default function LoginForm() {
     <form 
       onSubmit={(e) => {
         setLogingIn(true);
-        setTimeout(() => setLogingIn("error"), 2000);
+        setTimeout(() => {
+          form.handleSubmit();
+          setTimeout(() => setLogingIn("error"), 2000);
+        }, 2000);
         e.preventDefault();
         e.stopPropagation();
         form.handleSubmit();
