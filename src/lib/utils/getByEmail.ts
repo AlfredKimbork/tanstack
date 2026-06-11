@@ -5,7 +5,7 @@ const getByEmail = createServerFn().handler(async ({ data }) => {
   const { email } = data;
 
   try {
-    const user = await prisma .user.findUnique({
+    const user = await prisma.user.findUnique({
       where:{ email }
     })
     return user;

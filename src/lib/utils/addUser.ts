@@ -17,7 +17,6 @@ const addUser = createServerFn().handler(async ({ data }) => {
   } 
 
   catch (error) {
-    // console.error("Error creating user:", error);
     return false;
   }
 });

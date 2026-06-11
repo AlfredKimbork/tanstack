@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { getProducts } from '../utils'
+import getProducts from '#/lib/utils/getProducts'
 
 type Product = {
   id: string

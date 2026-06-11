@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 
+import login from '#/lib/login'
 import addUser from '#/lib/utils/addUser'
 
 interface signUpFormValues {
@@ -13,10 +14,16 @@ interface signUpFormValues {
   confirmPassword: string
   administrator: boolean
   remember: boolean
+  exists?: boolean
+}
+
+type LogingInStates = {
+  logingIn: boolean | "error"
 }
 
 export default function SignUpForm() {
   const [userExists, setUserExists] = useState(false);
+  const [logingIn, setLogingIn] = useState<LogingInStates['logingIn']>(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -34,17 +41,19 @@ export default function SignUpForm() {
     onSubmit: async ({ value }) => {
       if(!await addUser({ data: value })) {
         setUserExists(true);
+      } else {
+        setUserExists(false);
+        login({ id: undefined, username: value.username, email: value.email, password: value.password, administrator: value.administrator }, value.remember);
+        navigate({ to: '/' });
       }
-        else {
-          setUserExists(false);
-          navigate({ to: '/' });
-        }
     },
   });
 
   return (
     <form
       onSubmit={(e) => {
+        setLogingIn(true);
+        setTimeout(() => setLogingIn("error"), 2000);
         e.preventDefault();
         e.stopPropagation();
         form.handleSubmit();
@@ -82,12 +91,11 @@ export default function SignUpForm() {
         <form.Field 
           name="email"
           validators={{
-            onBlur: ({ value }) => 
-              !value 
-                ? 'Email is required' 
-                : !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) 
-                  ? 'Invalid email address'
-                  : undefined,
+            onBlur: ({ value }) => !value 
+              ? 'Email is required' 
+              : !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) 
+                ? 'Invalid email address'
+                : undefined,
             onChangeAsyncDebounceMs: 500,
             onChangeAsync: async ({ value }) => {
               await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -196,7 +204,9 @@ export default function SignUpForm() {
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
                     onClick={(e) =>{
                       e.preventDefault();
-                      setShowConfirmPassword(!showConfirmPassword)}
+                      setShowConfirmPassword(!showConfirmPassword);
+                      setTimeout(() => setShowPassword(false), 2000);
+                    }
                     } 
                   >
                     {showConfirmPassword ? <FaRegEyeSlash /> : <FaRegEye />}
@@ -268,14 +278,20 @@ export default function SignUpForm() {
       </div>
 
         {userExists && (
-          <div  >
+          <div> 
             <em className="text-red-500">User already exists in our system, please login or use a different email.</em>
             <Link to="/login" className="ml-1 hover:underline">
               Login here
             </Link>
           </div>
           )}
-      <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Sign up</button>
+      <button 
+        type="submit" 
+        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+        disabled={logingIn === true}
+      >
+        {logingIn === "error" ? 'Signup failed, try again' : logingIn ? 'Signing up...' : 'Sign up'}
+      </button>
     </form>
   )
 }
