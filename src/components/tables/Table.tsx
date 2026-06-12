@@ -1,0 +1,143 @@
+import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import type { User, Product } from '#/../generated/prisma/client'
+import { useState, useMemo } from 'react'
+import getServerUsers from '#/lib/utils/getServerUsers'
+import { useServerFn } from '@tanstack/react-start'
+import { useQuery } from '@tanstack/react-query'
+import { useLoggedInUser } from '#/integrations/tanstack-query/root-provider'
+import updateServerAdministrator from '#/lib/utils/updateServerAdministrator'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import getServerProducts from '#/lib/utils/getServerProducts'
+
+type TableRowByType = {
+  users: User
+  products: Product
+}
+
+type TableDataType = keyof TableRowByType
+
+type TableProps<TDataType extends TableDataType> = {
+  columns: ColumnDef<TableRowByType[TDataType], any>[]
+  dataType: TDataType
+  search: string | number
+}
+
+export default function Table<TDataType extends TableDataType>({ columns, dataType, search }: TableProps<TDataType>) {
+  const loggedInUser = useLoggedInUser();
+  const queryClient = useQueryClient()
+  const getUsers = useServerFn(getServerUsers)
+  const getProducts = useServerFn(getServerProducts)
+  const updateAdministrator = useServerFn(updateServerAdministrator)
+
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const sortby = sorting[0]?.id || 'id';
+  const direction = sorting[0]?.desc ? 'desc' : 'asc';
+
+  const usersQuery = useQuery({ 
+    queryKey: ['users', sortby, direction], 
+    queryFn: () => getUsers({ data: { sortby, direction } }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: dataType === 'users',
+  })
+
+  const productsQuery = useQuery({ 
+    queryKey: ['products', sortby, direction], 
+    queryFn: () => getProducts({ data: { sortby, direction } }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: dataType === 'products',
+  })
+
+  const serverData = dataType === 'users' ? usersQuery.data : productsQuery.data
+
+  const mutation = useMutation({
+    mutationFn: (variables: { id: number; administrator: boolean }) =>
+      updateAdministrator({ data: variables }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [dataType] })
+    },
+  });
+
+  console.log(search, typeof search)
+
+  const data = useMemo(() => {
+    if (dataType === 'users') {
+      const userRows = (serverData ?? []) as User[]
+
+      return typeof search === 'string'
+        ? userRows.filter(
+            (user) =>
+              user.username.toLowerCase().includes(search.toLowerCase()) ||
+              user.email.toLowerCase().includes(search.toLowerCase()),
+          )
+        : userRows.filter((user) => user.id === search)
+    }
+
+    const productRows = (serverData ?? []) as Product[]
+
+    return typeof search === 'string'
+      ? productRows.filter((product) =>
+          product.name.toLowerCase().includes(search.toLowerCase()),
+        )
+      : productRows.filter((product) => product.id === search)
+  }, [dataType, serverData, search]);
+
+  const table = useReactTable({
+      data: data as TableRowByType[TDataType][],
+      columns: columns as ColumnDef<TableRowByType[TDataType], unknown>[],
+      debugTable: true,
+      getCoreRowModel: getCoreRowModel(),
+      state: {
+        sorting,
+      },
+      onSortingChange: setSorting,
+    });
+
+  return (
+    <table className="bg-white p-8 rounded-md w-full grid grid-cols-[2rem_repeat(3,auto)_6rem]">
+      <thead className="grid grid-cols-subgrid col-span-full">
+        {table.getHeaderGroups().map(headerGroup => (
+          <tr key={headerGroup.id} className="grid grid-cols-subgrid col-span-full border border-gray-300 rounded-t-md">
+            {headerGroup.headers.map(header => (
+              <th key={header.id} className="text-left font-bold text-sm text-gray-800 even:bg-gray-200 odd:bg-gray-300 p-2">
+                <div 
+                  {...{
+                    className: header.column.getCanSort() ? 'cursor-pointer select-none' : '',
+                    onClick: header.column.getToggleSortingHandler(),
+                  }} 
+                  >
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {{ asc: ' 🔼', desc: ' 🔽' }[header.column.getIsSorted() as string] ?? null}
+                </div>
+              </th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+      <tbody className="grid grid-cols-subgrid col-span-full rounded-b-md">
+        {table.getRowModel().rows.map(row => (
+          <tr key={row.id} className="border border-gray-300 grid grid-cols-subgrid col-span-full last:rounded-b-md">
+            {row.getVisibleCells().map(cell => (
+                <td key={cell.id} className={`text-left text-sm text-gray-700 odd:bg-gray-50 p-2 ${cell.column.id === 'email' || cell.column.id === 'username' ? 'overflow-x-auto' : ''} ${dataType === 'users' && (cell.row.original as User).email !== loggedInUser!.email ? 'flex items-center justify-between' : ''}`}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                {dataType === 'users' && cell.column.id === 'administrator' && (row.original as User).email !== loggedInUser!.email ? (
+                  <button
+                  className="ml-4 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-xs"
+                  onClick={() =>
+                    mutation.mutate({
+                      id: (row.original as User).id,
+                      administrator: !(row.original as User).administrator,
+                    })
+                  }
+                  >
+                    Switch admin
+                  </button>
+                ) : null}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}

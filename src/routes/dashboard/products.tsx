@@ -1,21 +1,50 @@
-import getServerProducts from '#/lib/utils/getServerProducts'
-import { createFileRoute } from '@tanstack/react-router'
-import { useServerFn } from '@tanstack/react-start'
-import { useQuery } from '@tanstack/react-query'
+import { createFileRoute } from '@tanstack/react-router';
+import type { Product } from '../../../generated/prisma/client';
+import { createColumnHelper } from '@tanstack/react-table';
+import Table from '#/components/tables/Table';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/dashboard/products')({
   component: RouteComponent,
-  loader: () => getServerProducts(),
 })
 
+const columnHelper = createColumnHelper<Product>()
+const columns = [
+  columnHelper.accessor('id', {
+    header: () => 'ID',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('name', {
+    header: () => 'Name',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('price', {
+    header: () => 'Price',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('inventory', {
+    header: () => 'Inventory',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('created_at', {
+    header: () => 'Created At',
+    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  }),
+]
+
 function RouteComponent() {
-  const getProducts = useServerFn(getServerProducts)
-  const {data: products} = useQuery({ 
-    queryKey: ["products"], 
-    queryFn: () => getProducts() ,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  })
-  console.log(products)
+  const [search, setSearch] = useState<number | string>('')
   // product name, price, inventory, edit button, delete button
-  return <div>Hello "/dashboard/products"!</div>
+  return (
+    <>
+      <input 
+          type="text" 
+          placeholder="Search products..." 
+          value={search} 
+          onChange={(e) => setSearch(parseInt(e.target.value) || e.target.value)} 
+          className="mb-4 p-2 border border-gray-300 rounded" 
+        />
+      <Table columns={columns} dataType="products" search={search} />
+    </>
+  )
 }

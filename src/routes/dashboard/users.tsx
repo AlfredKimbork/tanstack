@@ -1,27 +1,50 @@
 import { createFileRoute } from '@tanstack/react-router'
-import getServerUsers from '#/lib/utils/getServerUsers'
-import { useServerFn } from '@tanstack/react-start'
-import { useQuery } from '@tanstack/react-query'
-import UserTable from '#/components/tables/UserTable'
+import { useState } from 'react'
+import type { User } from '../../../generated/prisma/client'
+import { createColumnHelper } from '@tanstack/react-table'
+import Table from '#/components/tables/Table'
 
 export const Route = createFileRoute('/dashboard/users')({
   component: RouteComponent,
-  loader: () => getServerUsers(),
 })
 
+const columnHelper = createColumnHelper<User>()
+const columns = [
+  columnHelper.accessor('id', {
+    header: () => 'ID',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('username', {
+    header: () => 'Username',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('email', {
+    header: () => 'Email',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('administrator', {
+    header: () => 'Admin',
+    cell: (info) => info.getValue() ? "Yes" : "No",
+  }),
+  columnHelper.accessor('created_at', {
+    header: () => 'Created At',
+    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  }),
+]
+
 function RouteComponent() {
-  const getUsers = useServerFn(getServerUsers)
-
-  const { data: users } = useQuery({ 
-    queryKey: ["users"], 
-    queryFn: () => getUsers() ,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  })
-  console.log(users)
-
-  // username, email, admin status, delete button
+  const [search, setSearch] = useState<number | string>('')
+  
   return (
-    <UserTable />
-    
+    <>
+      <input 
+        type="text" 
+        placeholder="Search users..." 
+        value={search} 
+        onChange={(e) => setSearch(parseInt(e.target.value) || e.target.value)} 
+        className="mb-4 p-2 border border-gray-300 rounded" 
+      />
+      <Table columns={columns} dataType="users" search={search} />
+    </>
   )
 }
