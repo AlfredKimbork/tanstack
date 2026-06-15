@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start"
 import { z } from "zod"
-import prisma from "./prisma"
+import prisma from "../prisma"
 
-const getProductById = createServerFn()
+const getServerProductById = createServerFn()
 
   .inputValidator(
     z.object({
@@ -17,4 +17,4 @@ const getProductById = createServerFn()
     return product
 })
 
-export default getProductById
+export default getServerProductById

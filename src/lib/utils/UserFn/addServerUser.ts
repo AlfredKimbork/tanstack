@@ -1,4 +1,4 @@
-import prisma from "./prisma";
+import prisma from "../prisma";
 import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 

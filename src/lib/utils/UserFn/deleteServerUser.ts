@@ -1,4 +1,4 @@
-import prisma from "./prisma";
+import prisma from "../prisma";
 import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 
@@ -6,7 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 const deleteUser = createServerFn()
   .inputValidator(
     z.object({
-      id: z.number(),
+      id: z.number().optional(),
     })
   )
   .handler(async ({ data }) => {

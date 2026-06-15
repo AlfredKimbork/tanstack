@@ -1,10 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router';
-import type { Product } from '../../../generated/prisma/client';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import type { Product } from '#/../generated/prisma/client';
 import { createColumnHelper } from '@tanstack/react-table';
-import Table from '#/components/tables/Table';
+import Table from '#/components/Table';
 import { useState } from 'react';
 
-export const Route = createFileRoute('/dashboard/products')({
+
+export const Route = createFileRoute('/dashboard/products/')({
   component: RouteComponent,
 })
 
@@ -34,6 +35,7 @@ const columns = [
 
 function RouteComponent() {
   const [search, setSearch] = useState<number | string>('')
+
   // product name, price, inventory, edit button, delete button
   return (
     <>
@@ -45,6 +47,9 @@ function RouteComponent() {
           className="mb-4 p-2 border border-gray-300 rounded" 
         />
       <Table columns={columns} dataType="products" search={search} />
+      <Link to="/dashboard/products/new" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" >
+        Add Product
+      </Link>
     </>
   )
 }

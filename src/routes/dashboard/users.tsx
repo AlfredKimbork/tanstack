@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { User } from '../../../generated/prisma/client'
 import { createColumnHelper } from '@tanstack/react-table'
-import Table from '#/components/tables/Table'
+import Table from '#/components/Table'
 
 export const Route = createFileRoute('/dashboard/users')({
   component: RouteComponent,

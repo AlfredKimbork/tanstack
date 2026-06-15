@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 
+import addUser from '#/lib/utils/UserFn/addServerUser'
 import login from '#/lib/login'
-import addUser from '#/lib/utils/addUser'
 
 interface signUpFormValues {
   username: string
@@ -17,13 +17,13 @@ interface signUpFormValues {
   exists?: boolean
 }
 
-type LogingInStates = {
-  logingIn: boolean | "error"
+type loggingInStates = {
+  loggingIn: boolean | "error"
 }
 
 export default function SignUpForm() {
   const [userExists, setUserExists] = useState(false);
-  const [logingIn, setLogingIn] = useState<LogingInStates['logingIn']>(false);
+  const [loggingIn, serLoggingIn] = useState<loggingInStates['loggingIn']>(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -52,13 +52,12 @@ export default function SignUpForm() {
   return (
     <form
       onSubmit={(e) => {
-        setLogingIn(true);
+        serLoggingIn(true);
         setTimeout(() => {
           form.handleSubmit();
-          setTimeout(() => setLogingIn("error"), 2000);
+          setTimeout(() => serLoggingIn("error"), 2000);
         }, 2000);
         e.preventDefault();
-        e.stopPropagation();
         form.handleSubmit();
       }}
       className="max-w-120 bg-white p-8 rounded-md w-full flex flex-col gap-4"
@@ -292,9 +291,9 @@ export default function SignUpForm() {
       <button 
         type="submit" 
         className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-        disabled={logingIn === true}
+        disabled={loggingIn === true}
       >
-        {logingIn === "error" ? 'Signup failed, try again' : logingIn ? 'Signing up...' : 'Sign up'}
+        {loggingIn === "error" ? 'Signup failed, try again' : loggingIn ? 'Signing up...' : 'Sign up'}
       </button>
     </form>
   )

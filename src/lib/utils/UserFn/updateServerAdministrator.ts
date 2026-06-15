@@ -1,8 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import prisma from './prisma';
+import prisma from '../prisma';
 
-const updateServerAdministator = createServerFn({method: 'POST'})
+const updateServerAdministrator = createServerFn({method: 'POST'})
   .inputValidator(
     z.object({
       id: z.number(),
@@ -18,4 +18,4 @@ const updateServerAdministator = createServerFn({method: 'POST'})
     return user;
 })
 
-export default updateServerAdministator;
+export default updateServerAdministrator;

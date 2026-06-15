@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useNavigate } from '@tanstack/react-router'
 import login from '#/lib/login'
-import deleteUser from '#/lib/utils/deleteUser'
+import deleteUser from '#/lib/utils/UserFn/deleteServerUser'
 import { useLoggedInUser } from '#/integrations/tanstack-query/root-provider'
 
 export const Route = createFileRoute('/account')({

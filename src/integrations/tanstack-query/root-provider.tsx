@@ -1,12 +1,27 @@
 import { QueryClient } from '@tanstack/react-query'
 import { useSyncExternalStore } from 'react'
 
+export type Cart = {
+    productId: number
+    productName: string
+    quantity: number
+  }[]| null
+
+export type CartContext = {
+  readonly cart: Cart
+  setCart: (cart: Cart) => void
+  syncFromUser: () => void
+}
+
+let currentCart: Cart = null
+
 export type LoggedInUser = {
   id: number | undefined
   username: string
   email: string
   password: string
   administrator: boolean
+  cart?: Cart
 } | null
 
 export type UserContext = {
@@ -37,6 +52,15 @@ function readLoggedInUserFromStorage(): LoggedInUser {
   }
 }
 
+export function setCurrentCart(cart: Cart) {
+  currentCart = cart
+  notifyListeners()
+}
+
+export function syncCartFromUser() {
+  setCurrentCart(loggedInUser?.cart ?? null)
+}
+
 export function setLoggedInUser(user: LoggedInUser) {
   loggedInUser = user
   notifyListeners()
@@ -54,6 +78,10 @@ function subscribe(listener: () => void) {
   }
 }
 
+export function useCart() {
+  return useSyncExternalStore(subscribe, () => currentCart, () => null)
+}
+
 export function useLoggedInUser() {
   return useSyncExternalStore(subscribe, () => loggedInUser, () => null)
 }
@@ -63,6 +91,13 @@ export function getContext() {
 
   return {
     queryClient,
+    cartContext: {
+      get cart() {
+        return currentCart
+      },
+      setCart: setCurrentCart,
+      syncFromUser: syncCartFromUser,
+    } as CartContext,
     userContext: {
       get user() {
         return loggedInUser

@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
-import getByEmail from '#/lib/utils/getByEmail'
+import getByEmail from '#/lib/utils/UserFn/getServerUserByEmail'
 import login from '#/lib/login'
 
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
@@ -14,21 +14,21 @@ interface LoginFormValues {
   remember: boolean
 }
 
-type LogingInStates = {
-  logingIn: boolean | "error"
+type loggingInStates = {
+  loggingIn: boolean | "error"
 }
 
 export default function LoginForm() {
-  const [userdoesntExist, setUserDoesntExist] = useState(false);
+  const [userdoesntExist, setUserdoesntExist] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [logingIn, setLogingIn] = useState<LogingInStates['logingIn']>(false);
+  const [loggingIn, setLoggingIn] = useState<loggingInStates['loggingIn']>(false);
 
   const checkPassword = (email: string) => getByEmail({ data: { email } })
     .then(user => user?.password)
   const checkEmail = async (email: string) => {
     const user = await getByEmail({ data: { email } })  
-    if(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) && !user) setUserDoesntExist(true);
-      else setUserDoesntExist(false);
+    if(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) && !user) setUserdoesntExist(true);
+      else setUserdoesntExist(false);
     return user;
   }
 
@@ -49,10 +49,10 @@ export default function LoginForm() {
   return (
     <form 
       onSubmit={(e) => {
-        setLogingIn(true);
+        setLoggingIn(true);
         setTimeout(() => {
           form.handleSubmit();
-          setTimeout(() => setLogingIn("error"), 2000);
+          setTimeout(() => setLoggingIn("error"), 2000);
         }, 2000);
         e.preventDefault();
         e.stopPropagation();
@@ -65,7 +65,7 @@ export default function LoginForm() {
           name="email"
           validators={{
             onBlur: ({ value }) => {
-              setUserDoesntExist(false);
+              setUserdoesntExist(false);
               return !value 
                 ? 'Email is required' 
                 : !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value) 
@@ -184,10 +184,10 @@ export default function LoginForm() {
         />
       </div>
       <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700" 
-        disabled={logingIn === true} 
+        disabled={loggingIn === true} 
         onSubmit={() => form.handleSubmit()}
       >
-        {logingIn === "error" ? 'Login failed, try again' : logingIn ? 'Logging in...' : 'Login'}
+        {loggingIn === "error" ? 'Login failed, try again' : loggingIn ? 'Logging in...' : 'Login'}
       </button>
     </form>
   )
