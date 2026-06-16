@@ -23,7 +23,7 @@ export default function ProductForm({ mutation }: { mutation: any }) {
 
       if( await addProduct({ data: value })) {
         mutation.mutate()
-        navigate({ to: '/products' })
+        navigate({ to: '/dashboard/products' })
       }
     }
   })

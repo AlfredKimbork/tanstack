@@ -43,7 +43,7 @@ export default function SignUpForm() {
         setUserExists(true);
       } else {
         setUserExists(false);
-        login({ id: undefined, username: value.username, email: value.email, password: value.password, administrator: value.administrator }, value.remember);
+        login({ id: undefined, username: value.username, email: value.email, password: value.password, created_at: new Date(), administrator: value.administrator }, value.remember);
         navigate({ to: '/' });
       }
     },
@@ -157,6 +157,7 @@ export default function SignUpForm() {
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <button 
+                    tabIndex={-1}
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
                     onClick={(e) => {
                       e.preventDefault();
@@ -204,6 +205,7 @@ export default function SignUpForm() {
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <button 
+                    tabIndex={-1}
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
                     onClick={(e) =>{
                       e.preventDefault();

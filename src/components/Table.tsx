@@ -9,7 +9,7 @@ import { useLoggedInUser } from '#/integrations/tanstack-query/root-provider'
 import getServerUsers from '#/lib/utils/UserFn/getServerUsers'
 import getServerProducts from '#/lib/utils/ProductFn/getServerProducts'
 import updateServerAdministrator from '#/lib/utils/UserFn/updateServerAdministrator'
-import updateServerInventory from '#/lib/utils/ProductFn/updateServerInventory'
+import updateServerProduct from '#/lib/utils/ProductFn/updateServerProduct'
 
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import type { User, Product } from '#/../generated/prisma/client'
@@ -29,61 +29,55 @@ export default function Table<TDataType extends TableDataType>({columns, dataTyp
   const getUsers = useServerFn(getServerUsers)
   const getProducts = useServerFn(getServerProducts)
   const updateAdministrator = useServerFn(updateServerAdministrator)
-  const updateInventory = useServerFn(updateServerInventory)
+  const updateInventory = useServerFn(updateServerProduct)
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const sortby = sorting[0]?.id || 'id';
   const direction = sorting[0]?.desc ? 'desc' : 'asc';
 
-  const usersQuery = useQuery({ 
-    queryKey: ['users', sortby, direction], 
-    queryFn: () => getUsers({ data: { sortby: sortby as 'id' | 'username' | 'email' | 'administrator' | 'created_at', direction } }),
-    enabled: dataType === 'users',
-  })
+  const { data: serverData } = dataType === 'users' 
+    ? useQuery({ 
+        queryKey: ['users', sortby, direction], 
+        queryFn: () => getUsers({ data: { sortby: sortby as 'id' | 'username' | 'email' | 'administrator' | 'created_at', direction } }),
+        enabled: dataType === 'users',
+      })
+    : useQuery({ 
+        queryKey: ['products', sortby, direction], 
+        queryFn: () => getProducts({ data: { sortby: sortby as 'name' | 'id' | 'created_at' | 'price' | 'inventory', direction } }),
+        enabled: dataType === 'products',
+      })
 
-  const productsQuery = useQuery({ 
-    queryKey: ['products', sortby, direction], 
-    queryFn: () => getProducts({ data: { sortby: sortby as 'name' | 'id' | 'created_at' | 'price' | 'inventory', direction } }),
-    enabled: dataType === 'products',
-  })
-
-  const serverData = dataType ==='users' ? usersQuery.data : productsQuery.data
-
-  const adminMutation = useMutation({
+  const mutation = (dataType === 'users' 
+    ? useMutation({
     mutationFn: (variables: { id: number; administrator: boolean }) =>
       updateAdministrator({ data: variables }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [dataType] })
-    },
-  });
-  const inventoryMutation = useMutation({
-    mutationFn: (variables: { id: number; inventory: number }) =>
-      updateInventory({ data: variables }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [dataType] })
-    },
-  });
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [dataType] })
+      },
+    })
+    : useMutation({
+      mutationFn: (variables: { id: number; inventory?: number; price?: string }) =>
+        updateInventory({ data: variables }),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [dataType] })
+        },
+      })) as { mutate: (variables: { id: number; administrator?: boolean; inventory?: number; price?: string }) => void };
   
   const data = useMemo(() => {
     if (dataType === 'users') {
       const userRows = (serverData ?? []) as User[]
-      
-      return typeof search === 'string'
-      ? userRows.filter(
-        (user) =>
-          user.username.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase()),
-      )
-      : userRows.filter((user) => user.id === search)
-    }
-    
-    const productRows = (serverData ?? []) as Product[]
 
-    return typeof search === 'string'
-      ? productRows.filter((product) =>
-          product.name.toLowerCase().includes(search.toLowerCase()),
-        )
-      : productRows.filter((product) => product.id === search)
+      return typeof search === 'string'
+        ? userRows.filter((user) => user.username.toLowerCase().includes(search.toLowerCase()) 
+          || user.email.toLowerCase().includes(search.toLowerCase()))
+        : userRows.filter((user) => user.id === search)
+    } else {
+      const productRows = (serverData ?? []) as Product[]
+
+      return typeof search === 'string'
+        ? productRows.filter((product) => product.name.toLowerCase().includes(search.toLowerCase()))
+        : productRows.filter((product) => product.id === search)
+    }
   }, [dataType, serverData, search]);
 
   const table = useReactTable({
@@ -142,7 +136,7 @@ export default function Table<TDataType extends TableDataType>({columns, dataTyp
                   <button
                     className="ml-4 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-xs"
                     onClick={() =>
-                      adminMutation.mutate({
+                      mutation.mutate({
                         id: (row.original as User).id,
                         administrator: !(row.original as User).administrator,
                       })
@@ -151,20 +145,29 @@ export default function Table<TDataType extends TableDataType>({columns, dataTyp
                     Switch admin
                   </button>
                 )}
-                {dataType ==='products' && cell.column.id === 'inventory' && (
+                {cell.column.id === 'inventory' || cell.column.id === 'price' ?  (
                   <button
-                    className="ml-4 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-xs"
+                    tabIndex={1}
+                    className={`ml-4 px-2 py-1  text-white rounded  transition-colors text-xs ${(cell.row.original as Product).inventory === 0 ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
                     onClick={() => {
-                      const newInventory = Number(prompt('Adjust inventory for ' + (row.original as Product).name)?.trim())
-                      if (!isNaN(newInventory)) inventoryMutation.mutate({
-                        id: (row.original as Product).id,
-                        inventory: newInventory,
-                      })
+                      if (cell.column.id === 'price') {
+                        const newPrice = Number(prompt('Adjust price for ' + (row.original as Product).name)?.trim())
+                        if (!isNaN(newPrice)) mutation.mutate({
+                          id: (row.original as Product).id,
+                          price: newPrice.toString(),
+                        })
+                      } else{
+                        const newInventory = Number(prompt('Adjust inventory for ' + (row.original as Product).name)?.trim())
+                        if (!isNaN(newInventory)) mutation.mutate({
+                          id: (row.original as Product).id,
+                          inventory: newInventory,
+                        })
+                      }
                     }}
                   >
                     Adjust
                   </button>
-                )}
+                ) : null}
               </td>
             ))}
           </tr>

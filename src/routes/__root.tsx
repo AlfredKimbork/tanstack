@@ -15,7 +15,8 @@ import appCss from '../styles.css?url'
 
 import { useEffect } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
-import { type CartContext, type UserContext, getContext, syncLoggedInUserFromStorage } from '../integrations/tanstack-query/root-provider'
+import type { CartContext, UserContext } from '../integrations/tanstack-query/root-provider'
+import { syncLoggedInUserFromStorage } from '../integrations/tanstack-query/root-provider'
 
 interface MyRouterContext {
   queryClient: QueryClient

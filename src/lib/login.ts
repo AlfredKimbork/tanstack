@@ -1,10 +1,12 @@
 import {
   setCurrentCart,
   setLoggedInUser,
-  type LoggedInUser,
 } from '#/integrations/tanstack-query/root-provider'
+import type { LoggedInUser } from '#/integrations/tanstack-query/root-provider'
+
 
 const login = (user: LoggedInUser, remember: boolean = false) => {
+  console.log('Logging in user:', user, 'Remember:', remember)
   if (!user) {
     localStorage.removeItem('user')
     sessionStorage.removeItem('user')
@@ -19,7 +21,6 @@ const login = (user: LoggedInUser, remember: boolean = false) => {
     sessionStorage.setItem('user', JSON.stringify(user))
   }
 
-  setCurrentCart(user.cart ?? null)
   setLoggedInUser(user)
 }
 

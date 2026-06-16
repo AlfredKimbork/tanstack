@@ -2,7 +2,6 @@ import { Link, useLocation } from '@tanstack/react-router'
 import { useCart, useLoggedInUser } from '#/integrations/tanstack-query/root-provider'
 
 import { GrCart } from 'react-icons/gr'
-import { useEffect } from 'react'
 
 export default function Header() {
   const location = useLocation()

@@ -3,9 +3,11 @@ import { useSyncExternalStore } from 'react'
 
 export type Cart = {
     productId: number
+    created_at?: Date
     productName: string
     quantity: number
-  }[]| null
+    cartId?: number
+  }[] | null
 
 export type CartContext = {
   readonly cart: Cart
@@ -21,6 +23,7 @@ export type LoggedInUser = {
   email: string
   password: string
   administrator: boolean
+  created_at?: Date
   cart?: Cart
 } | null
 
@@ -31,6 +34,8 @@ export type UserContext = {
 }
 
 let loggedInUser: LoggedInUser = null
+type StoredUserSource = 'local' | 'session' | null
+let activeUserStorage: StoredUserSource = null
 
 const listeners = new Set<() => void>()
 
@@ -38,22 +43,61 @@ function notifyListeners() {
   listeners.forEach((listener) => listener())
 }
 
-function readLoggedInUserFromStorage(): LoggedInUser {
-  const storedUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
+function readLoggedInUserFromStorage(): { user: LoggedInUser; source: StoredUserSource } {
+  const localUser = localStorage.getItem('user')
+  if (localUser) {
+    try {
+      return { user: JSON.parse(localUser) as LoggedInUser, source: 'local' }
+    } catch {
+      return { user: null, source: null }
+    }
+  }
 
-  if (!storedUser) {
-    return null
+  const sessionUser = sessionStorage.getItem('user')
+  if (!sessionUser) {
+    return { user: null, source: null }
   }
 
   try {
-    return JSON.parse(storedUser) as LoggedInUser
+    return { user: JSON.parse(sessionUser) as LoggedInUser, source: 'session' }
   } catch {
-    return null
+    return { user: null, source: null }
   }
+}
+
+function persistLoggedInUser(user: LoggedInUser) {
+  if (!user) {
+    localStorage.removeItem('user')
+    sessionStorage.removeItem('user')
+    activeUserStorage = null
+    return
+  }
+
+  const serializedUser = JSON.stringify(user)
+
+  if (activeUserStorage === 'local') {
+    localStorage.setItem('user', serializedUser)
+    sessionStorage.removeItem('user')
+    return
+  }
+
+  if (activeUserStorage === 'session') {
+    sessionStorage.setItem('user', serializedUser)
+    localStorage.removeItem('user')
+    return
+  }
+
+  sessionStorage.setItem('user', serializedUser)
 }
 
 export function setCurrentCart(cart: Cart) {
   currentCart = cart
+
+  if (loggedInUser) {
+    loggedInUser = { ...loggedInUser, cart }
+    persistLoggedInUser(loggedInUser)
+  }
+
   notifyListeners()
 }
 
@@ -63,11 +107,21 @@ export function syncCartFromUser() {
 
 export function setLoggedInUser(user: LoggedInUser) {
   loggedInUser = user
+  currentCart = user?.cart ?? null
+  if (!user) {
+    activeUserStorage = null
+  } else if (localStorage.getItem('user')) {
+    activeUserStorage = 'local'
+  } else if (sessionStorage.getItem('user')) {
+    activeUserStorage = 'session'
+  }
   notifyListeners()
 }
 
 export function syncLoggedInUserFromStorage() {
-  setLoggedInUser(readLoggedInUserFromStorage())
+  const stored = readLoggedInUserFromStorage()
+  activeUserStorage = stored.source
+  setLoggedInUser(stored.user)
 }
 
 function subscribe(listener: () => void) {
@@ -97,14 +151,14 @@ export function getContext() {
       },
       setCart: setCurrentCart,
       syncFromUser: syncCartFromUser,
-    } as CartContext,
+    },
     userContext: {
       get user() {
         return loggedInUser
       },
       setUser: setLoggedInUser,
       syncFromStorage: syncLoggedInUserFromStorage,
-    } as UserContext,
+    },
   }
 }
 export default function TanstackQueryProvider() {}

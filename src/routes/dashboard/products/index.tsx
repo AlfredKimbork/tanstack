@@ -47,7 +47,7 @@ function RouteComponent() {
           className="mb-4 p-2 border border-gray-300 rounded" 
         />
       <Table columns={columns} dataType="products" search={search} />
-      <Link to="/dashboard/products/new" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" >
+      <Link to="/dashboard/products/new" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" target="_blank">
         Add Product
       </Link>
     </>

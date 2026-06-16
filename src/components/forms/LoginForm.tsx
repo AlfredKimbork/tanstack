@@ -1,6 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { useNavigate } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import getByEmail from '#/lib/utils/UserFn/getServerUserByEmail'
@@ -137,6 +136,7 @@ export default function LoginForm() {
                     onChange={(e) => field.handleChange(e.target.value)}
                     />
                   <button 
+                    tabIndex={-1}
                     className="absolute right-2 top-[50%] translate-y-[-50%] text-gray-500"
                     onClick={(e) => {
                       e.preventDefault();

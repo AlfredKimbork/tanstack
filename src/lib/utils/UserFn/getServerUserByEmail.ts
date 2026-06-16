@@ -13,9 +13,36 @@ const getByEmail = createServerFn()
 
   try {
     const user = await prisma.user.findUnique({
-      where:{ email }
+      where: { email },
+      include: {
+        cart: {
+          include: {
+            items: true,
+          },
+        },
+      },
     })
-    return user;
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      password: user.password,
+      administrator: user.administrator,
+      created_at: user.created_at,
+      cart:
+        user.cart?.items.map(({ productId, created_at, productName, quantity, cartId }) => ({
+          productId,
+          created_at,
+          productName,
+          quantity,
+          cartId: cartId ?? undefined,
+        })) ?? null,
+    }
   }
 
   catch(error) {

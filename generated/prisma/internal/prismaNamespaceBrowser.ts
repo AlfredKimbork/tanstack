@@ -52,6 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Product: 'Product',
+  CartItem: 'CartItem',
+  Cart: 'Cart',
+  PreviousCart: 'PreviousCart',
   User: 'User',
   Saved: 'Saved'
 } as const
@@ -81,6 +84,37 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const CartItemScalarFieldEnum = {
+  id: 'id',
+  cartId: 'cartId',
+  productName: 'productName',
+  productId: 'productId',
+  quantity: 'quantity',
+  created_at: 'created_at',
+  previousCartId: 'previousCartId'
+} as const
+
+export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
+
+
+export const CartScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  created_at: 'created_at'
+} as const
+
+export type CartScalarFieldEnum = (typeof CartScalarFieldEnum)[keyof typeof CartScalarFieldEnum]
+
+
+export const PreviousCartScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  created_at: 'created_at'
+} as const
+
+export type PreviousCartScalarFieldEnum = (typeof PreviousCartScalarFieldEnum)[keyof typeof PreviousCartScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {
@@ -118,6 +152,21 @@ export const ProductOrderByRelevanceFieldEnum = {
 } as const
 
 export type ProductOrderByRelevanceFieldEnum = (typeof ProductOrderByRelevanceFieldEnum)[keyof typeof ProductOrderByRelevanceFieldEnum]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const CartItemOrderByRelevanceFieldEnum = {
+  productName: 'productName'
+} as const
+
+export type CartItemOrderByRelevanceFieldEnum = (typeof CartItemOrderByRelevanceFieldEnum)[keyof typeof CartItemOrderByRelevanceFieldEnum]
 
 
 export const UserOrderByRelevanceFieldEnum = {
