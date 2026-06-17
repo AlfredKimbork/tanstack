@@ -8,6 +8,7 @@ export const setServerCart = createServerFn()
       index: z.number().optional(),
       email: z.string().email(),
       productName: z.string(),
+      price: z.string(),
       productId: z.number(),
       quantity: z.number(),
     })
@@ -40,22 +41,20 @@ export const setServerCart = createServerFn()
     console.log(id)
     
     if (!cart) {
-      console.log('Creating new cart for user:', email);
       cart = await prisma.cart.create({
         data: {
           user: { connect: { email: email } },
-          items: { create: { productId, quantity, productName } },
+          items: { create: { productId, quantity, productName, price: product.price || 'Price unavailable' } },
         },
         include: { items: true },
       });
     } else if(id) { 
-      console.log('Updating existing cart item for user:', email);
       await prisma.cartItem.update({ where: { id }, data: { quantity } });
     } else {
       cart = await prisma.cart.update({
         where: { id: cart.id },
         data: {
-          items: { create: { productId, quantity, productName } },
+          items: { create: { productId, quantity, productName, price: product.price || 'Price unavailable' } },
         },
         include: { items: true },
       });

@@ -36,7 +36,6 @@ const columns = [
 function RouteComponent() {
   const [search, setSearch] = useState<number | string>('')
 
-  // product name, price, inventory, edit button, delete button
   return (
     <>
       <input 

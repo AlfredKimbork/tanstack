@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 
-import addUser from '#/lib/utils/UserFn/addServerUser'
+import { addServerUser } from '#/lib/utils/userServerFunctions'
 import login from '#/lib/login'
 
 interface signUpFormValues {
@@ -23,7 +23,7 @@ type loggingInStates = {
 
 export default function SignUpForm() {
   const [userExists, setUserExists] = useState(false);
-  const [loggingIn, serLoggingIn] = useState<loggingInStates['loggingIn']>(false);
+  const [loggingIn, setLoggingIn] = useState<loggingInStates['loggingIn']>(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -39,7 +39,7 @@ export default function SignUpForm() {
       administrator: false,
     } as signUpFormValues,
     onSubmit: async ({ value }) => {
-      if(!await addUser({ data: value })) {
+      if(!await addServerUser({ data: value })) {
         setUserExists(true);
       } else {
         setUserExists(false);
@@ -52,10 +52,10 @@ export default function SignUpForm() {
   return (
     <form
       onSubmit={(e) => {
-        serLoggingIn(true);
+        setLoggingIn(true);
         setTimeout(() => {
           form.handleSubmit();
-          setTimeout(() => serLoggingIn("error"), 2000);
+          setTimeout(() => setLoggingIn("error"), 2000);
         }, 2000);
         e.preventDefault();
         form.handleSubmit();

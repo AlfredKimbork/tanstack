@@ -2,7 +2,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import getServerProducts from '#/lib/utils/ProductFn/getServerProducts';
+import { getServerProducts } from '#/lib/utils/productServerFunctions';
 
 import ProductForm from '#/components/forms/ProductForm'
 

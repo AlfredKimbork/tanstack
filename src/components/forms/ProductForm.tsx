@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form';
 import { useNavigate } from '@tanstack/react-router';
 
-import addProduct from '../../lib/utils/ProductFn/addServerProduct';
+import { addServerProduct } from '../../lib/utils/productServerFunctions';
 
 interface ProductFormValues {
   name: string
@@ -21,7 +21,7 @@ export default function ProductForm({ mutation }: { mutation: any }) {
     onSubmit: async ({ value }) => {
       console.log(value)
 
-      if( await addProduct({ data: value })) {
+      if( await addServerProduct({ data: value })) {
         mutation.mutate()
         navigate({ to: '/dashboard/products' })
       }

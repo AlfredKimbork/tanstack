@@ -15,13 +15,17 @@ import appCss from '../styles.css?url'
 
 import { useEffect } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
-import type { CartContext, UserContext } from '../integrations/tanstack-query/root-provider'
-import { syncLoggedInUserFromStorage } from '../integrations/tanstack-query/root-provider'
+import type { CartContext, UserContext, NoticeContext } from '../integrations/tanstack-query/root-provider'
+import { getContext, syncLoggedInUserFromStorage, useNotice } from '../integrations/tanstack-query/root-provider'
+
+import { AnimatePresence } from 'framer-motion';
+import Notice from '../components/Notice';
 
 interface MyRouterContext {
   queryClient: QueryClient
   userContext: UserContext
   cartContext: CartContext
+  noticeContext: NoticeContext
 }
 
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
@@ -54,6 +58,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     syncLoggedInUserFromStorage()
   }, [])
+  const notice = useNotice()
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -63,7 +68,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="min-h-screen flex flex-col">
           <Header />
-            {children}
+          <AnimatePresence>
+            {notice && <Notice notice={notice} />}
+          </AnimatePresence>
+                {children}
           <Footer />
         <TanStackDevtools
           config={{

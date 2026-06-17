@@ -861,6 +861,7 @@ export const CartItemScalarFieldEnum = {
   productName: 'productName',
   productId: 'productId',
   quantity: 'quantity',
+  price: 'price',
   created_at: 'created_at',
   previousCartId: 'previousCartId'
 } as const
@@ -932,7 +933,8 @@ export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 export const CartItemOrderByRelevanceFieldEnum = {
-  productName: 'productName'
+  productName: 'productName',
+  price: 'price'
 } as const
 
 export type CartItemOrderByRelevanceFieldEnum = (typeof CartItemOrderByRelevanceFieldEnum)[keyof typeof CartItemOrderByRelevanceFieldEnum]

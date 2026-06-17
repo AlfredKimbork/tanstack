@@ -30,6 +30,7 @@ model CartItem {
   productName String
   productId   Int   
   quantity    Int
+  price       String
   created_at DateTime   @default(now())
   
   previousCart PreviousCart? @relation(fields: [previousCartId], references: [id])

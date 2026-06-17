@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
-import getByEmail from '#/lib/utils/UserFn/getServerUserByEmail'
+import { getUserByEmail } from '#/lib/utils/userServerFunctions'
 import login from '#/lib/login'
 
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
@@ -22,10 +22,10 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loggingIn, setLoggingIn] = useState<loggingInStates['loggingIn']>(false);
 
-  const checkPassword = (email: string) => getByEmail({ data: { email } })
+  const checkPassword = (email: string) => getUserByEmail({ data: { email } })
     .then(user => user?.password)
   const checkEmail = async (email: string) => {
-    const user = await getByEmail({ data: { email } })  
+    const user = await getUserByEmail({ data: { email } })  
     if(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) && !user) setUserdoesntExist(true);
       else setUserdoesntExist(false);
     return user;
@@ -39,7 +39,7 @@ export default function LoginForm() {
       password: '',
     } as LoginFormValues,
     onSubmit: async ({ value }) => {
-      login(await getByEmail({ data: { email: value.email } }), value.remember, );
+      login(await getUserByEmail({ data: { email: value.email } }), value.remember, );
       navigate({ to: '/' });
     },
   })

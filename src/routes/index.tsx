@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useLoggedInUser } from '#/integrations/tanstack-query/root-provider'
+import PrevList from '#/components/PrevList'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -11,6 +12,8 @@ function App() {
     <main className="page-wrap px-4 pb-8 pt-14">
       {loggedInUser ? <p>Welcome, {loggedInUser.username}!</p> : <p>Welcome, Guest!</p>}
       <p>This is the home page.</p>
+
+      <PrevList />
       
     </main>
   )

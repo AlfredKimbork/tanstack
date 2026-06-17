@@ -1,10 +1,28 @@
 import { QueryClient } from '@tanstack/react-query'
 import { useSyncExternalStore } from 'react'
 
+export type Notice = {
+  title: string
+  message: string
+}
+
+export type NoticeContext = {
+  get notice(): Notice | null
+  setNotice: (notice: Notice | null) => void
+}
+
+let notice: Notice | null = null
+
+export function setNotice(newNotice: Notice | null) {
+  notice = newNotice
+  notifyListeners()
+}
+
 export type Cart = {
     productId: number
     created_at?: Date
     productName: string
+    price: string
     quantity: number
     cartId?: number
   }[] | null
@@ -16,6 +34,21 @@ export type CartContext = {
 }
 
 let currentCart: Cart = null
+
+export function setCurrentCart(cart: Cart) {
+  currentCart = cart
+
+  if (loggedInUser) {
+    loggedInUser = { ...loggedInUser, cart }
+    persistLoggedInUser(loggedInUser)
+  }
+
+  notifyListeners()
+}
+
+export function syncCartFromUser() {
+  setCurrentCart(loggedInUser?.cart ?? null)
+}
 
 export type LoggedInUser = {
   id: number | undefined
@@ -90,21 +123,6 @@ function persistLoggedInUser(user: LoggedInUser) {
   sessionStorage.setItem('user', serializedUser)
 }
 
-export function setCurrentCart(cart: Cart) {
-  currentCart = cart
-
-  if (loggedInUser) {
-    loggedInUser = { ...loggedInUser, cart }
-    persistLoggedInUser(loggedInUser)
-  }
-
-  notifyListeners()
-}
-
-export function syncCartFromUser() {
-  setCurrentCart(loggedInUser?.cart ?? null)
-}
-
 export function setLoggedInUser(user: LoggedInUser) {
   loggedInUser = user
   currentCart = user?.cart ?? null
@@ -136,6 +154,10 @@ export function useCart() {
   return useSyncExternalStore(subscribe, () => currentCart, () => null)
 }
 
+export function useNotice() {
+  return useSyncExternalStore(subscribe, () => notice, () => null)
+}
+
 export function useLoggedInUser() {
   return useSyncExternalStore(subscribe, () => loggedInUser, () => null)
 }
@@ -159,6 +181,12 @@ export function getContext() {
       setUser: setLoggedInUser,
       syncFromStorage: syncLoggedInUserFromStorage,
     },
+    noticeContext: {
+      get notice() {
+        return notice
+      },
+      setNotice: setNotice,
+    }
   }
 }
 export default function TanstackQueryProvider() {}

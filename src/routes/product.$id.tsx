@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import getProductById from '#/lib/utils/ProductFn/getServerProductById'
+import { getServerProductById } from '#/lib/utils/productServerFunctions'
 import type { Product } from '#/../generated/prisma/client'
 import CartButton from '#/components/CartButton'
 import { useState } from 'react'
@@ -8,7 +8,7 @@ export const Route = createFileRoute('/product/$id')({
   component: RouteComponent,
   loader: async ({ params }) => {
     const { id } = params
-    const product = await getProductById({ data: { id: Number(id) } })
+    const product = await getServerProductById({ data: { id: Number(id) } })
     return { product, id }
   }
 })
@@ -38,7 +38,7 @@ function RouteComponent() {
           className={`border border-gray-300 rounded py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-24 text-center text-lg font-medium text-gray-700 hover:border-gray-400 transition duration-200 ${inventory === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
         />
       </div>
-      <CartButton productId={id} productName={name} amount={amount} index={Number(index) - 1} disabled={inventory === 0} />
+      <CartButton productId={id} productName={name} amount={amount} price={price} index={Number(index) - 1} disabled={inventory === 0} />
     </main>
   )
 }
