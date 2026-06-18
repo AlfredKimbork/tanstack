@@ -13,6 +13,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as ApprovedRouteImport } from './routes/approved'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -40,6 +41,11 @@ const LoginRoute = LoginRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApprovedRoute = ApprovedRouteImport.update({
+  id: '/approved',
+  path: '/approved',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/account': typeof AccountRoute
+  '/approved': typeof ApprovedRoute
   '/cart': typeof CartRoute
   '/login': typeof LoginRoute
   '/products': typeof ProductsRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/approved': typeof ApprovedRoute
   '/cart': typeof CartRoute
   '/login': typeof LoginRoute
   '/products': typeof ProductsRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/account': typeof AccountRoute
+  '/approved': typeof ApprovedRoute
   '/cart': typeof CartRoute
   '/login': typeof LoginRoute
   '/products': typeof ProductsRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/account'
+    | '/approved'
     | '/cart'
     | '/login'
     | '/products'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/approved'
     | '/cart'
     | '/login'
     | '/products'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/account'
+    | '/approved'
     | '/cart'
     | '/login'
     | '/products'
@@ -173,6 +185,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AccountRoute: typeof AccountRoute
+  ApprovedRoute: typeof ApprovedRoute
   CartRoute: typeof CartRoute
   LoginRoute: typeof LoginRoute
   ProductsRoute: typeof ProductsRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/approved': {
+      id: '/approved'
+      path: '/approved'
+      fullPath: '/approved'
+      preLoaderRoute: typeof ApprovedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account': {
@@ -291,6 +311,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AccountRoute: AccountRoute,
+  ApprovedRoute: ApprovedRoute,
   CartRoute: CartRoute,
   LoginRoute: LoginRoute,
   ProductsRoute: ProductsRoute,

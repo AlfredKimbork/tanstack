@@ -70,7 +70,7 @@ export default function Table<TDataType extends TableDataType>({columns, dataTyp
     });
 
   return (
-    <table className="bg-white p-8 rounded-md w-full grid grid-cols-[2rem_repeat(3,auto)_6rem]">
+    <table className="bg-white p-8 rounded-md w-full grid grid-cols-[2rem_repeat(3,auto)_6rem] col-gap-4 row-gap-2">
       <Thead table={table as any} />
       <tbody className="grid grid-cols-subgrid col-span-full rounded-b-md">
         {table.getRowModel().rows.map(row => (

@@ -3,8 +3,9 @@ import { useReactTable } from '@tanstack/react-table'
 import type { TableRowByType, TableDataType } from '.'
 
 export default function Thead({ table }: { table: ReturnType<typeof useReactTable<TableRowByType[TableDataType]>> }) {
+  console.log(table.getHeaderGroups())
   return (
-    <thead className="grid grid-cols-subgrid col-span-full">
+    <thead className="grid grid-cols-subgrid col-span-full rounded-t-md border border-gray-300">
         {table.getHeaderGroups().map(headerGroup => (
           <tr key={headerGroup.id} className="grid grid-cols-subgrid col-span-full border border-gray-300 rounded-t-md">
             {headerGroup.headers.map(header => (

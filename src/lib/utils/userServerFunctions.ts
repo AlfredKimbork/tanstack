@@ -111,22 +111,61 @@ export const addServerUser = createServerFn()
 export const deleteServerUser = createServerFn()
   .inputValidator(
     z.object({
-      id: z.number().optional(),
+      id: z.number(),
     })
   )
   .handler(async ({ data }) => {
     const { id } = data;
     try {
-      const deletedUser = await prisma.user.delete({
-        where: { id },
-    })
-    return deletedUser;
-  } 
+      const deletedUser = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.findUnique({
+          where: { id },
+          include: {
+            cart: { include: { items: true } },
+            prevCarts: { include: { items: true } },
+            savedProducts: true,
+          },
+        })
 
-  catch (error) {
-    return false;
-  }
-});
+        if (!user) {
+          throw new Error('User not found')
+        }
+
+        if (user.cart) {
+          await tx.cartItem.deleteMany({
+            where: { cartId: user.cart.id },
+          })
+
+          await tx.cart.delete({
+            where: { id: user.cart.id },
+          })
+        }
+
+        if (user.prevCarts.length > 0) {
+          const previousCartIds = user.prevCarts.map((previousCart) => previousCart.id)
+
+          await tx.cartItem.deleteMany({
+            where: { previousCartId: { in: previousCartIds } },
+          })
+
+          await tx.previousCart.deleteMany({
+            where: { userId: id },
+          })
+        }
+
+        return tx.user.delete({
+          where: { id },
+          include: { cart: true, prevCarts: true },
+        })
+      });
+      return deletedUser;
+    } 
+
+    catch (error) {
+      console.error('Error deleting user:', error);
+      return false;
+    }
+  });
 
 export const getUserByEmail = createServerFn()
   .inputValidator(

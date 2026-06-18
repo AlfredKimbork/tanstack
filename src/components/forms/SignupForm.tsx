@@ -39,11 +39,13 @@ export default function SignUpForm() {
       administrator: false,
     } as signUpFormValues,
     onSubmit: async ({ value }) => {
-      if(!await addServerUser({ data: value })) {
+      const createdUser = await addServerUser({ data: value })
+
+      if(!createdUser) {
         setUserExists(true);
       } else {
         setUserExists(false);
-        login({ id: undefined, username: value.username, email: value.email, password: value.password, created_at: new Date(), administrator: value.administrator }, value.remember);
+        login(createdUser, value.remember);
         navigate({ to: '/' });
       }
     },

@@ -38,7 +38,6 @@ export const setServerCart = createServerFn()
 
     let cart = user.cart;
     const id = cart?.items[index!]?.id
-    console.log(id)
     
     if (!cart) {
       cart = await prisma.cart.create({
@@ -109,7 +108,6 @@ export const deleteServerCartItem = createServerFn()
     }
 
     const deletedItem = await prisma.cartItem.delete({ where: { id } });
-    console.log(cart!.items.length);
     if(cart!.items.length === 1) {
       await prisma.cart.delete({ where: { id: cart!.id } })
     }

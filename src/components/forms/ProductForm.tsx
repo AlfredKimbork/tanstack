@@ -33,7 +33,7 @@ export default function ProductForm({ mutation }: { mutation: any }) {
         e.preventDefault()
         form.handleSubmit(e)
       }}
-      className="max-w-120 bg-white p-8 rounded-md w-full flex flex-col gap-4"
+      className="max-w-120 bg-white p-8 rounded-md w-full flex flex-col gap-4 justify-start items-start shadow w-full max-w-4xl mx-auto sm:p-6 lg:p-8"
     >
       <div>
         <form.Field 
@@ -49,7 +49,7 @@ export default function ProductForm({ mutation }: { mutation: any }) {
               <>
                 <label htmlFor={field.name}>Product Name:</label>
                 <input 
-                  className={`w-full border rounded-md p-2 ${field.state.meta.errors.length > 0 ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`w-full border rounded-md p-2  ${field.state.meta.errors.length > 0 ? 'border-red-500' : 'border-slate-300'}`}
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
@@ -76,7 +76,7 @@ export default function ProductForm({ mutation }: { mutation: any }) {
               <>
                 <label htmlFor={field.name}>Product Price:</label>
                 <input 
-                  className={`w-full border rounded-md p-2 ${field.state.meta.errors.length > 0 ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`w-full border rounded-md p-2  ${field.state.meta.errors.length > 0 ? 'border-red-500' : 'border-slate-300'}`}
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
@@ -104,7 +104,7 @@ export default function ProductForm({ mutation }: { mutation: any }) {
                 <label htmlFor={field.name}>Product Inventory:</label>
                 <input 
                   type="number"
-                  className={`w-full border rounded-md p-2 ${field.state.meta.errors.length > 0 ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`w-full border rounded-md p-2  ${field.state.meta.errors.length > 0 ? 'border-red-500' : 'border-slate-300'}`}
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
@@ -119,7 +119,7 @@ export default function ProductForm({ mutation }: { mutation: any }) {
       </div>
       <button
         type="submit"
-        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-white transition mt-4"
       >
         Add Product
       </button>

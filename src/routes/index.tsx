@@ -12,9 +12,8 @@ function App() {
     <main className="page-wrap px-4 pb-8 pt-14">
       {loggedInUser ? <p>Welcome, {loggedInUser.username}!</p> : <p>Welcome, Guest!</p>}
       <p>This is the home page.</p>
-
-      <PrevList />
       
+      <PrevList />
     </main>
   )
 }

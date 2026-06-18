@@ -1,11 +1,8 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useLoggedInUser } from '#/integrations/tanstack-query/root-provider'
 
-import { deleteServerUser } from '#/lib/utils/userServerFunctions'
-import login from '#/lib/login'
-
 import AccountDetails from '#/components/AccountDetails'
-import CurrentCart from '#/components/CurrentCart'
+import CurrentCart from '#/components/CurrentCartSection'
 import PrevList from '#/components/PrevList'
 
 export const Route = createFileRoute('/account')({
@@ -13,38 +10,30 @@ export const Route = createFileRoute('/account')({
 })
 
 function RouteComponent() {
-  const { id, username, email, password, created_at } = useLoggedInUser() || {};
-
-  const navigate = useNavigate()
+  const loggedInUser = useLoggedInUser()
+  const { id, username, email, password, created_at } = loggedInUser || {};
   
-
   return (
-    <main className="page-wrap px-4 pb-8 pt-4">
-      <h1 className="text-2xl font-bold">Account Page</h1>
-      {email && (<>
-        <AccountDetails username={username!} email={email} password={password!} created_at={created_at!} />
-        <CurrentCart />
-        <PrevList />
-        <button 
-          onClick={() => {
-            login(null);
-            navigate({ to: '/' });
-          }} 
-          className="border border-red-500 text-red-500 py-2 px-4 rounded-md"
-        >
-          Logout
-        </button>
-        <button 
-          onClick={() => {
-            deleteServerUser({ data: { id } });
-            login(null);
-            navigate({ to: '/' });
-          }} 
-          className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 ml-4"
-        >
-          delete account
-        </button>
-      </>)}
+    <main className="min-h-screen p-4 md:flex md:flex-col gap-6 justify-start items-center bg-gray-100 sm:p-6 lg:p-8 w-full max-w-4xl mx-auto rounded-md shadow mt-6 mb-6">
+      {
+        email && id !== undefined ? (
+          <>
+            <h1 className="text-2xl font-bold">Account Page</h1>
+            <div className="lg:grid lg:grid-cols-2 lg:gap-6 w-full">
+                <AccountDetails username={username!} email={email!} password={password!} created_at={created_at!} id={id!} />
+                <CurrentCart />
+                <PrevList />
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-center text-gray-700">You need to log in again before viewing account details or deleting the account.</p>
+            <Link to="/login" className="text-blue-500 hover:underline">
+              Log in
+            </Link>
+          </>
+        )
+      }
     </main>
   )
 }

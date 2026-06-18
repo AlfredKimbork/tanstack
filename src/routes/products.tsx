@@ -15,14 +15,14 @@ function RouteComponent() {
   const { products }: { products: Product[] } = Route.useLoaderData()
 
   return (
-    <div className="p-4 space-y-4 bg-gray-100 rounded shadow w-full max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold">Products</h1>
-      <ul className="space-y-2">
+    <div className="p-4 space-y-4 bg-gray-100 rounded shadow w-full max-w-2xl mx-auto mt-14 mb-8">
+      <h2 className="text-2xl font-bold">Products</h2>
+      <ul className="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4 ">
         {products.map(({ id, name, price, inventory }, index) => (
           <li key={id}>
-            <Link to='/product/$id' params={{ id: String(id) }} className={`p-4 border border-gray-300 rounded bg-white hover:bg-gray-50 transition flex justify-between items-center ${inventory === 0 ? 'cursor-not-allowed opacity-50' : ''}`}>
+            <Link to='/product/$id' params={{ id: String(id) }} className={`p-4 border border-gray-300 rounded bg-white hover:bg-gray-50 transition grid grid-cols-1 gap-2 justify-between items-center h-full ${inventory === 0 ? 'cursor-not-allowed opacity-50' : ''}`}>
               {name} - ${price} {inventory === 0 && <span className="text-red-500 italic">Out of stock</span>}
-              <CartButton productId={id} productName={name} price={price} index={index} disabled={inventory === 0} />
+              {inventory > 0 && <CartButton productId={id} productName={name} price={price} index={index} disabled={inventory === 0} />}
             </Link>
           </li>
         ))}

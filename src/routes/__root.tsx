@@ -6,7 +6,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import Footer from '../components/Footer'
-import Header from '../components/Header'
+import Header, { MobileHeader } from '../components/Header'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { formDevtoolsPlugin } from '@tanstack/react-form-devtools'
@@ -16,7 +16,7 @@ import appCss from '../styles.css?url'
 import { useEffect } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import type { CartContext, UserContext, NoticeContext } from '../integrations/tanstack-query/root-provider'
-import { getContext, syncLoggedInUserFromStorage, useNotice } from '../integrations/tanstack-query/root-provider'
+import { syncLoggedInUserFromStorage, useNotice } from '../integrations/tanstack-query/root-provider'
 
 import { AnimatePresence } from 'framer-motion';
 import Notice from '../components/Notice';
@@ -59,7 +59,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     syncLoggedInUserFromStorage()
   }, [])
   const notice = useNotice()
-
+  const thisWindow = typeof window !== 'undefined' ? window : null;
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -67,7 +67,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="min-h-screen flex flex-col">
-          <Header />
+          {/* <Header /> */}
+          {thisWindow?.screen.width! > 768 ? <Header /> : <MobileHeader />}
           <AnimatePresence>
             {notice && <Notice notice={notice} />}
           </AnimatePresence>
